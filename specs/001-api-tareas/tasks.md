@@ -54,7 +54,7 @@
 - [ ] T010 [US2] Crear formulario WikiText de tarea que valide `title` obligatorio y no vacío, `fields.estado` con valores `pendiente` o `completada`, descripción `text` opcional y `fields.checklist` opcional con referencia existente en `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers/POC - Editar tarea.tid`
 - [ ] T011 [US2] Implementar en el formulario de tarea el envío de creación/actualización mediante `PUT /recipes/default/tiddlers/{title-codificado}`, cuerpo TiddlyWeb JSON y cabeceras `Content-Type: application/json` y `x-requested-with: TiddlyWiki`; impedir el envío cuando `/status` indica `read_only` y reflejar éxito solo ante `204` en `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers/POC - Editar tarea.tid`
 - [ ] T012 [P] [US2] Crear formulario WikiText para crear, consultar y actualizar checklists y elementos: `title` obligatorio y no vacío; `fields.tarea` opcional con referencia existente; texto del elemento obligatorio; `fields.checklist` obligatorio con referencia existente; `fields.estado` igual a `pendiente` o `completada` en `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers/POC - Editar checklist.tid`
-- [ ] T013 [US2] Añadir eliminación confirmada de tareas, checklists y elementos con `DELETE /bags/default/tiddlers/{title-codificado}` y `x-requested-with: TiddlyWiki`; tras `204`, volver a cargar la colección y comunicar errores sin alterar la vista en `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers/POC - Editar tarea.tid` y `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers/POC - Editar checklist.tid`
+- [ ] T013 [US2] Añadir eliminación confirmada de tareas, checklists y elementos con `DELETE /bags/default/tiddlers/{title-codificado}` y `x-requested-with: TiddlyWiki`; cada borrado afecta solo al tiddler seleccionado. Conservar los elementos relacionados y mostrar su relación como no disponible si falta el referente. Tras `204`, volver a cargar la colección y comunicar errores sin alterar la vista en `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers/POC - Editar tarea.tid` y `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers/POC - Editar checklist.tid`
 
 **Punto de control**: Cada cambio persiste tras una lectura posterior; una operación rechazada no aparece como exitosa.
 
@@ -81,7 +81,7 @@
 **Propósito**: Documentar el alcance demostrado y recorrer manualmente las capacidades de extremo a extremo.
 
 - [ ] T017 [P] Documentar en castellano las operaciones demostradas y los endpoints fuera del alcance de tareas/checklists en `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers/POC - Alcance del WebServer API.tid`
-- [ ] T018 Ejecutar el recorrido manual de `/home/dev/projects/70_Fast_TW_SDD/specs/001-api-tareas/quickstart.md` en la instancia real y navegador visible; corregir problemas solo en tiddlers bajo `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers`
+- [ ] T018 Ejecutar el recorrido manual de `/home/dev/projects/70_Fast_TW_SDD/specs/001-api-tareas/quickstart.md` en la instancia real y navegador visible; comprobar carga de tiddlers, enlaces, transclusiones, filtros y flujo principal; corregir problemas solo en tiddlers bajo `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers`
 - [ ] T019 Revisar todos los tiddlers de la feature contra la constitución: castellano, WikiText, sin JavaScript/CSS/HTML y guardados exclusivamente en `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers`
 
 ## Dependencias y orden de ejecución

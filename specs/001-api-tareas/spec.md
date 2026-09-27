@@ -79,15 +79,15 @@ Como usuario o persona que evalúa la POC, quiero comprobar si el servidor admit
 
 - **FR-001**: La POC MUST presentar tareas y checklists en castellano, con título, estado y relaciones entre elementos identificables.
 - **FR-002**: La persona MUST poder consultar el estado del servicio y distinguir disponibilidad, acceso de solo lectura y versión cuando el servicio los comunica.
-- **FR-003**: La persona MUST poder listar las tareas de la POC sin incluir por defecto contenido interno de sistema ni tareas ajenas a esta gestión.
+- **FR-003**: La persona MUST poder listar tareas, checklists y elementos de checklist de la POC, identificados respectivamente por las etiquetas `Tarea`, `Checklist` y `Elemento de checklist`, sin incluir por defecto contenido interno del sistema ni otros tiddlers.
 - **FR-004**: La persona MUST poder consultar los campos de una tarea individual y recibir una indicación clara cuando el título no existe.
 - **FR-005**: La persona MUST poder crear y actualizar una tarea con título, descripción, estado y pertenencia opcional a una checklist.
 - **FR-006**: La persona MUST poder cambiar una tarea entre pendiente y completada, y ver el cambio reflejado en la lista y el detalle.
-- **FR-007**: La persona MUST poder crear, consultar, actualizar y eliminar elementos de checklist, conservando una relación comprensible con su tarea o lista.
-- **FR-008**: La persona MUST poder eliminar una tarea y confirmar su ausencia en la consulta posterior.
+- **FR-007**: La persona MUST poder crear, consultar, actualizar y eliminar checklists y elementos de checklist, conservando una relación comprensible con su tarea o lista. Consultar incluye ver los campos de un elemento individual y los elementos agrupados en su checklist.
+- **FR-008**: La persona MUST poder eliminar una tarea y confirmar su ausencia en la consulta posterior. Eliminar una tarea o checklist afecta solo al tiddler seleccionado; los elementos relacionados se conservan y muestran la relación como no disponible si el referente ya no existe.
 - **FR-009**: La POC MUST presentar fallos de disponibilidad, autenticación, autorización y validación como errores comprensibles; MUST NOT informar éxito si el servidor no lo confirmó.
 - **FR-010**: La POC MUST permitir comparar la vista de datos con la representación renderizada de una tarea.
-- **FR-011**: La POC MUST identificar las operaciones cubiertas y sus límites, y ejercitar directamente desde WikiText las operaciones disponibles de lectura, alta, actualización y eliminación del WebServer API en el recorrido de tareas y checklists.
+- **FR-011**: La POC MUST identificar las operaciones cubiertas y sus límites, y ejercitar directamente desde WikiText `GET /status`, `GET /recipes/default/tiddlers.json`, `GET /recipes/default/tiddlers/{title}`, `PUT /recipes/default/tiddlers/{title}`, `DELETE /bags/default/tiddlers/{title}` y `GET /{title}` para renderizado. El alcance se limita al recorrido de tareas y checklists; no requiere explorar otros endpoints del WebServer API.
 - **FR-012**: El recorrido MUST poder completarse en una instancia local de TiddlyWiki y usar las capacidades disponibles de WikiText y del WebServer API; no MUST añadir JavaScript, CSS, HTML, paquetes, plugins ni cambios de configuración.
 
 ### Entidades principales
@@ -102,8 +102,8 @@ Como usuario o persona que evalúa la POC, quiero comprobar si el servidor admit
 ### Resultados medibles
 
 - **SC-001**: En una demostración local, una persona completa en menos de 3 minutos el recorrido de listar tareas, abrir una checklist y consultar una tarea.
-- **SC-002**: En 10 de 10 intentos de demostración, crear, editar, completar y eliminar una tarea produce un resultado visible y coherente en la consulta siguiente.
-- **SC-003**: En 5 de 5 escenarios preparados (título ausente, servicio no disponible, solo lectura, falta de autenticación y fallo de escritura), la persona distingue que la operación no se completó.
+- **SC-002**: En 10 ejecuciones completas del recorrido de crear, editar, completar y eliminar una tarea, cada operación produce un resultado visible y coherente en una consulta posterior; se registra cada ejecución como correcta solo si la consulta confirma el resultado esperado.
+- **SC-003**: En 5 escenarios preparados —título ausente, servicio no disponible, solo lectura, falta de autenticación y fallo de escritura— la persona distingue que la operación no se completó. La guía manual describe cómo preparar cada escenario y qué señal observable confirma el fallo.
 - **SC-004**: La POC demuestra al menos una operación de lectura de colección, lectura individual, escritura, actualización, eliminación y representación renderizada de una tarea.
 - **SC-005**: Una persona puede explicar qué operaciones del servicio quedaron cubiertas y qué partes de la API no se exploraron después de revisar la POC.
 
@@ -112,6 +112,6 @@ Como usuario o persona que evalúa la POC, quiero comprobar si el servidor admit
 - El usuario principal es una persona que gestiona sus propias tareas en una wiki local o de confianza; la POC no implica colaboración multiusuario.
 - “Explorar todas las posibilidades” se interpreta como probar de extremo a extremo las operaciones relevantes del WebServer API para tareas y checklists desde WikiText; no requiere cubrir endpoints ajenos a ese caso de uso.
 - El alcance de esta feature se mantiene dentro de las restricciones de la constitución: WikiText en tiddlers de `/home/dev/projects/70_Fast_TW_SDD/MyMiki/tiddlers`; se permiten todas las capacidades disponibles en WikiText, incluidas llamadas directas al WebServer API, sin incorporar JavaScript, CSS, HTML, paquetes, plugins o cambios de configuración.
-- La documentación consultada describe rutas para estado, colección, tiddler individual, alta/actualización, eliminación y renderizado; estas rutas se consideran capacidades del servicio que la POC pretende representar, sin prescribir su implementación.
+- Las rutas incluidas en FR-011 delimitan las capacidades del WebServer API que la POC pretende representar, sin prescribir su implementación.
 - La wiki destino de la constitución y de esta feature es `/home/dev/projects/70_Fast_TW_SDD/MyMiki`, la wiki Node.js existente en el checkout.
 - La autorización y persistencia dependen de la configuración y permisos de la instancia local; no se presupone exposición pública ni se cambia la configuración del servidor como parte de esta feature.
