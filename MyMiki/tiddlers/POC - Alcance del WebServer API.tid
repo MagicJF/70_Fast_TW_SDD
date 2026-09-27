@@ -1,0 +1,19 @@
+title: POC - Alcance del WebServer API
+type: text/vnd.tiddlywiki
+
+!! Alcance demostrado
+
+Esta POC explora las operaciones de WebServer API necesarias para gestionar tareas y listas de comprobación desde WikiText:
+
+* `GET /status`: disponibilidad, acceso anónimo, solo lectura y versión comunicada.
+* `GET /recipes/default/tiddlers.json`: carga de la colección y selección local por etiquetas.
+* `GET /recipes/default/tiddlers/{title}`: consulta de campos y contenido individual.
+* `PUT /recipes/default/tiddlers/{title}`: creación o actualización de tareas, listas y elementos.
+* `DELETE /bags/default/tiddlers/{title}`: eliminación individual, tras confirmación.
+* `GET /{title}`: representación renderizada para comparar con los datos.
+
+Las solicitudes se hacen a la instancia local en `{{POC - Servidor local}}`. El contenido de la interfaz, los ejemplos y los procedimientos se escriben en WikiText y muestran los resultados reales recibidos.
+
+!! Fuera del alcance
+
+No se exploran otros recursos de WebServer API, sincronización externa, autenticación configurada, administración de usuarios, cambios de configuración, extensiones ni complementos. La POC no modifica automáticamente elementos relacionados al borrar una tarea o una lista.

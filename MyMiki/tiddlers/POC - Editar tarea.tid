@@ -1,0 +1,85 @@
+title: POC - Editar tarea
+type: text/vnd.tiddlywiki
+
+\define poc-validar-estado()
+<$action-setfield $tiddler="$:/temp/poc/escritura/estado-servidor" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/escritura/datos-servidor" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/escritura/permitida" text={{{ [<data>jsonget[read_only]match[false]then[si]] }}} />
+\end
+
+\define poc-guardar-escritura()
+<$action-setfield $tiddler="$:/temp/poc/escritura/estado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/escritura/error" text=<<error>> />
+<$action-setfield $tiddler="$:/temp/poc/escritura/cabeceras" text=<<headers>> />
+<$action-setfield $tiddler="$:/temp/poc/escritura/texto" text=<<statusText>> />
+\end
+
+\define poc-tarea-json()
+{"title":"<$text text={{$:/temp/poc/tarea/titulo}} />","tags":"Tarea","text":"<$text text={{$:/temp/poc/tarea/texto}} />","fields":{"estado":"<$text text={{$:/temp/poc/tarea/estado}} />","checklist":"<$text text={{$:/temp/poc/tarea/checklist}} />"}}
+\end
+
+\define poc-pedir-permiso()
+<$action-setfield $tiddler="$:/temp/poc/escritura/permitida" text="comprobando" />
+<$action-sendmessage $message="tm-http-request" method="GET" url="http://127.0.0.1:8090/status" oncompletion=<<poc-validar-estado>> />
+\end
+
+\define poc-enviar-tarea()
+<$action-setfield $tiddler="$:/temp/poc/escritura/estado" text="pending" />
+<$action-sendmessage $message="tm-http-request" method="PUT" url={{{ [{$:/temp/poc/tarea/titulo}encodeuricomponent[]addprefix[http://127.0.0.1:8090/recipes/default/tiddlers/]] }}} header-content-type="application/json" header-x-requested-with="TiddlyWiki" body=<<poc-tarea-json>> oncompletion=<<poc-guardar-escritura>> />
+\end
+
+\define poc-guardar-borrado()
+<$action-setfield $tiddler="$:/temp/poc/eliminacion/estado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/eliminacion/error" text=<<error>> />
+<$action-sendmessage $message="tm-http-request" method="GET" url="http://127.0.0.1:8090/recipes/default/tiddlers.json" oncompletion=<<poc-refrescar-coleccion>> />
+\end
+\define poc-refrescar-coleccion()
+<$action-setfield $tiddler="$:/temp/poc/coleccion/estado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/datos" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/error" text=<<error>> />
+\end
+
+!! Crear o actualizar una tarea
+
+El título identifica la tarea. Usa un título nuevo para crear; un título existente se actualizará al guardar.
+
+; Título
+: <$edit-text tiddler="$:/temp/poc/tarea/titulo" tag="input" />
+; Descripción
+: <$edit-text tiddler="$:/temp/poc/tarea/texto" tag="textarea" />
+; Estado
+: <$select tiddler="$:/temp/poc/tarea/estado"><option value="pendiente">Pendiente</option><option value="completada">Completada</option></$select>
+; Checklist opcional
+: <$edit-text tiddler="$:/temp/poc/tarea/checklist" tag="input" placeholder="Checklist - Preparación de demo" />
+
+<$button actions=<<poc-pedir-permiso>>>
+Comprobar permiso de escritura
+</$button>
+<$list filter="[{$:/temp/poc/escritura/permitida}match[comprobando]]">Comprobando permisos de la instancia…</$list>
+<$list filter="[{$:/temp/poc/escritura/permitida}match[si]]">
+<$list filter="[{$:/temp/poc/tarea/titulo}!is[blank]]">
+<$button actions=<<poc-enviar-tarea>>>
+Guardar tarea
+</$button>
+</$list>
+</$list>
+<$list filter="[{$:/temp/poc/escritura/permitida}!match[si]]">Consulta primero el estado. Si el servidor es de solo lectura, no se ofrece el guardado.</$list>
+<$list filter="[{$:/temp/poc/tarea/titulo}is[blank]]">Escribe un título para guardar la tarea.</$list>
+<$list filter="[{$:/temp/poc/tarea/estado}!match[pendiente]!match[completada]]">Selecciona un estado válido para la tarea.</$list>
+<$list filter="[{$:/temp/poc/tarea/checklist}!is[blank]]">Si indicas una checklist, debe existir con ese título antes de guardar.</$list>
+
+<$list filter="[{$:/temp/poc/escritura/estado}match[204]]">Guardado confirmado por el servidor (HTTP 204). Vuelve a cargar la lista para comprobarlo.</$list>
+<$list filter="[{$:/temp/poc/escritura/estado}!is[blank]!match[204]]">No se confirmó el guardado. HTTP {{ $:/temp/poc/escritura/estado }}: {{ $:/temp/poc/escritura/error }}</$list>
+<$list filter="[{$:/temp/poc/escritura/estado}match[pending]]">Guardando tarea…</$list>
+
+!! Eliminar tarea
+
+El borrado afecta solo al título introducido. Los elementos relacionados se conservan.
+<$button>
+<$action-confirm $message="¿Seguro que quieres borrar solo esta tarea? Los elementos relacionados se conservarán.">
+<$action-sendmessage $message="tm-http-request" method="DELETE" url={{{ [{$:/temp/poc/tarea/titulo}encodeuricomponent[]addprefix[http://127.0.0.1:8090/bags/default/tiddlers/]] }}} header-x-requested-with="TiddlyWiki" oncompletion=<<poc-guardar-borrado>> />
+</$action-confirm>
+Eliminar la tarea indicada
+</$button>
+<$list filter="[{$:/temp/poc/eliminacion/estado}match[204]]">Eliminación confirmada (HTTP 204). Vuelve a cargar la lista.</$list>
+<$list filter="[{$:/temp/poc/eliminacion/estado}!is[blank]!match[204]]">No se confirmó la eliminación. HTTP {{ $:/temp/poc/eliminacion/estado }}: {{ $:/temp/poc/eliminacion/error }}</$list>

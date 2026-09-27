@@ -1,0 +1,19 @@
+title: POC - API de tareas
+tags: $:/tags/TopLeftBar
+caption: API de tareas
+type: text/vnd.tiddlywiki
+
+!! API de tareas
+
+Esta demostración gestiona tareas y listas de comprobación mediante la API del servidor de esta wiki.
+
+* [[Ver tareas|POC - Lista de tareas]]
+* [[Consultar detalle de tarea|POC - Detalle de tarea]]
+* [[Ver listas de comprobación|POC - Lista de comprobación]]
+* [[Estado del servidor|POC - Estado del servidor]]
+* [[Editar tarea|POC - Editar tarea]]
+* [[Editar lista de comprobación|POC - Editar checklist]]
+* [[Representación de una tarea|POC - Representación de tarea]]
+* [[Alcance de la demostración|POC - Alcance del WebServer API]]
+
+<$transclude $tiddler="POC - API - solicitudes HTTP" />

@@ -1,0 +1,117 @@
+title: POC - Editar checklist
+type: text/vnd.tiddlywiki
+
+\define poc-guardar-lista()
+<$action-setfield $tiddler="$:/temp/poc/lista/estado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/lista/datos" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/lista/error" text=<<error>> />
+\end
+
+\define poc-guardar-elemento()
+<$action-setfield $tiddler="$:/temp/poc/elemento/resultado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/elemento/datos" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/elemento/error" text=<<error>> />
+\end
+
+\define poc-consultar-lista()
+<$action-sendmessage $message="tm-http-request" method="GET" url={{{ [{$:/temp/poc/checklist/titulo}encodeuricomponent[]addprefix[http://127.0.0.1:8090/recipes/default/tiddlers/]] }}} oncompletion=<<poc-recibir-lista>> />
+\end
+\define poc-recibir-lista()
+<$action-setfield $tiddler="$:/temp/poc/lista/consulta-estado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/lista/consulta-datos" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/lista/error" text=<<error>> />
+\end
+\define poc-consultar-elemento()
+<$action-sendmessage $message="tm-http-request" method="GET" url={{{ [{$:/temp/poc/elemento/titulo}encodeuricomponent[]addprefix[http://127.0.0.1:8090/recipes/default/tiddlers/]] }}} oncompletion=<<poc-recibir-elemento>> />
+\end
+\define poc-recibir-elemento()
+<$action-setfield $tiddler="$:/temp/poc/elemento/consulta-estado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/elemento/consulta-datos" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/elemento/error" text=<<error>> />
+\end
+
+\define poc-checklist-json()
+{"title":"<$text text={{$:/temp/poc/checklist/titulo}} />","tags":"Checklist","text":"Lista de comprobación","fields":{"tarea":"<$text text={{$:/temp/poc/checklist/tarea}} />"}}
+\end
+
+\define poc-enviar-lista()
+<$action-sendmessage $message="tm-http-request" method="PUT" url={{{ [{$:/temp/poc/checklist/titulo}encodeuricomponent[]addprefix[http://127.0.0.1:8090/recipes/default/tiddlers/]] }}} header-content-type="application/json" header-x-requested-with="TiddlyWiki" body=<<poc-checklist-json>> oncompletion=<<poc-guardar-lista>> />
+\end
+
+\define poc-enviar-elemento()
+<$action-sendmessage $message="tm-http-request" method="PUT" url={{{ [{$:/temp/poc/elemento/titulo}encodeuricomponent[]addprefix[http://127.0.0.1:8090/recipes/default/tiddlers/]] }}} header-content-type="application/json" header-x-requested-with="TiddlyWiki" body=<<poc-elemento-json>> oncompletion=<<poc-guardar-elemento>> />
+\end
+
+\define poc-guardar-borrado()
+<$action-setfield $tiddler="$:/temp/poc/checklist/borrado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/checklist/error" text=<<error>> />
+<$action-sendmessage $message="tm-http-request" method="GET" url="http://127.0.0.1:8090/recipes/default/tiddlers.json" oncompletion=<<poc-refrescar-coleccion>> />
+\end
+\define poc-refrescar-coleccion()
+<$action-setfield $tiddler="$:/temp/poc/coleccion/estado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/datos" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/error" text=<<error>> />
+\end
+
+\define poc-elemento-json()
+{"title":"<$text text={{$:/temp/poc/elemento/titulo}} />","tags":"[[Elemento de checklist]]","text":"<$text text={{$:/temp/poc/elemento/texto}} />","fields":{"checklist":"<$text text={{$:/temp/poc/elemento/checklist}} />","estado":"<$text text={{$:/temp/poc/elemento/estado}} />"}}
+\end
+
+!! Crear o actualizar una lista y un elemento
+
+La lista se crea o actualiza con título y tarea opcional.
+
+; Título de lista
+: <$edit-text tiddler="$:/temp/poc/checklist/titulo" tag="input" />
+; Tarea relacionada (opcional)
+: <$edit-text tiddler="$:/temp/poc/checklist/tarea" tag="input" />
+<$button actions=<<poc-consultar-lista>>>Consultar lista por título</$button>
+<$list filter="[{$:/temp/poc/lista/consulta-estado}match[200]]">Lista consultada: <$text text={{{ [{$:/temp/poc/lista/consulta-datos}jsonget[title]] }}} /></$list>
+<$list filter="[{$:/temp/poc/lista/consulta-estado}match[404]]">No existe una lista con ese título.</$list>
+<$list filter="[{$:/temp/poc/checklist/titulo}!is[blank]]">
+<$button actions=<<poc-enviar-lista>>>
+Guardar lista
+</$button>
+</$list>
+<$list filter="[{$:/temp/poc/checklist/titulo}is[blank]]">El título de la lista es obligatorio.</$list>
+
+; Título de elemento
+: <$edit-text tiddler="$:/temp/poc/elemento/titulo" tag="input" />
+; Texto del elemento
+: <$edit-text tiddler="$:/temp/poc/elemento/texto" tag="input" />
+; Título de la lista existente
+: <$edit-text tiddler="$:/temp/poc/elemento/checklist" tag="input" />
+<$button actions=<<poc-consultar-elemento>>>Consultar elemento por título</$button>
+<$list filter="[{$:/temp/poc/elemento/consulta-estado}match[200]]">Elemento consultado: <$text text={{{ [{$:/temp/poc/elemento/consulta-datos}jsonget[title]] }}} /></$list>
+<$list filter="[{$:/temp/poc/elemento/consulta-estado}match[404]]">No existe un elemento con ese título.</$list>
+; Estado
+: <$select tiddler="$:/temp/poc/elemento/estado"><option value="pendiente">Pendiente</option><option value="completada">Completada</option></$select>
+<$list filter="[{$:/temp/poc/elemento/titulo}!is[blank]]">
+<$list filter="[{$:/temp/poc/elemento/texto}!is[blank]]">
+<$list filter="[{$:/temp/poc/elemento/checklist}!is[blank]]">
+<$button actions=<<poc-enviar-elemento>>>
+Guardar elemento
+</$button>
+</$list>
+</$list>
+</$list>
+<$list filter="[{$:/temp/poc/elemento/titulo}is[blank]]">El título del elemento es obligatorio.</$list>
+<$list filter="[{$:/temp/poc/elemento/texto}is[blank]]">El texto del elemento es obligatorio.</$list>
+<$list filter="[{$:/temp/poc/elemento/checklist}is[blank]]">Indica una checklist existente para el elemento.</$list>
+<$list filter="[{$:/temp/poc/elemento/estado}!match[pendiente]!match[completada]]">Selecciona un estado válido para el elemento.</$list>
+<$list filter="[{$:/temp/poc/checklist/tarea}!is[blank]]">La relación con una tarea es opcional; si la indicas, escribe el título de una tarea existente.</$list>
+
+<$list filter="[{$:/temp/poc/lista/estado}match[204]]">Lista guardada (HTTP 204).</$list>
+<$list filter="[{$:/temp/poc/elemento/resultado}match[204]]">Elemento guardado (HTTP 204).</$list>
+
+!! Eliminar lista o elemento
+
+<$edit-text tiddler="$:/temp/poc/borrado/titulo" tag="input" placeholder="Título exacto que se eliminará" />
+<$button>
+<$action-confirm $message="Se borrará solo el tiddler indicado. Los elementos relacionados se conservarán.">
+<$action-sendmessage $message="tm-http-request" method="DELETE" url={{{ [{$:/temp/poc/borrado/titulo}encodeuricomponent[]addprefix[http://127.0.0.1:8090/bags/default/tiddlers/]] }}} header-x-requested-with="TiddlyWiki" oncompletion=<<poc-guardar-borrado>> />
+</$action-confirm>
+Eliminar solo el tiddler indicado
+</$button>
+<$list filter="[{$:/temp/poc/checklist/borrado}match[204]]">Eliminación confirmada (HTTP 204).</$list>
+<$list filter="[{$:/temp/poc/checklist/borrado}!is[blank]!match[204]]">No se confirmó la eliminación. HTTP {{ $:/temp/poc/checklist/borrado }}: {{ $:/temp/poc/checklist/error }}</$list>

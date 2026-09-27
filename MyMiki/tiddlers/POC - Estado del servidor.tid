@@ -1,0 +1,34 @@
+title: POC - Estado del servidor
+type: text/vnd.tiddlywiki
+
+\define poc-guardar-estado()
+<$action-setfield $tiddler="$:/temp/poc/estado/http" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/estado/datos" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/estado/error" text=<<error>> />
+<$action-setfield $tiddler="$:/temp/poc/estado/cabeceras" text=<<headers>> />
+<$action-setfield $tiddler="$:/temp/poc/estado/texto" text=<<statusText>> />
+\end
+
+\define poc-pedir-estado()
+<$action-setfield $tiddler="$:/temp/poc/estado/http" text="pending" />
+<$action-sendmessage $message="tm-http-request" method="GET" url="http://127.0.0.1:8090/status" oncompletion=<<poc-guardar-estado>> />
+\end
+
+!! Estado del servidor
+
+<$button actions=<<poc-pedir-estado>>>
+Consultar estado
+</$button>
+<$list filter="[{$:/temp/poc/estado/http}match[pending]]">Consultando estado…</$list>
+
+<$list filter="[{$:/temp/poc/estado/http}match[200]]">
+<$wikify name="respuesta" text={{$:/temp/poc/estado/datos}}>
+* Disponibilidad: disponible
+* Acceso anónimo: <$text text={{{ [<respuesta>jsonget[anonymous]] }}} />
+* Solo lectura: <$text text={{{ [<respuesta>jsonget[read_only]] }}} />
+* Versión TiddlyWiki: <$text text={{{ [<respuesta>jsonget[tiddlywiki_version]] }}} />
+</$wikify>
+</$list>
+<$list filter="[{$:/temp/poc/estado/http}!is[blank]!match[200]]">No se pudo consultar el estado. HTTP {{ $:/temp/poc/estado/http }}; {{ $:/temp/poc/estado/error }}</$list>
+
+<$transclude $tiddler="POC - API de tareas" />

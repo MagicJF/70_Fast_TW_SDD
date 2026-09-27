@@ -1,0 +1,44 @@
+title: POC - Lista de comprobación
+type: text/vnd.tiddlywiki
+
+\define poc-pedir-coleccion()
+<$action-setfield $tiddler="$:/temp/poc/coleccion/estado" text="pending" />
+<$action-sendmessage $message="tm-http-request" method="GET" url="http://127.0.0.1:8090/recipes/default/tiddlers.json" oncompletion=<<poc-guardar-coleccion>> />
+\end
+
+\define poc-guardar-coleccion()
+<$action-setfield $tiddler="$:/temp/poc/coleccion/estado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/datos" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/error" text=<<error>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/cabeceras" text=<<headers>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/texto-estado" text=<<statusText>> />
+\end
+
+!! Listas de comprobación
+
+<$button actions=<<poc-pedir-coleccion>>>
+Cargar listas desde el servidor
+</$button>
+
+<$list filter="[{$:/temp/poc/coleccion/estado}match[pending]]">Consultando la colección…</$list>
+<$list filter="[{$:/temp/poc/coleccion/estado}match[200]]">
+<$list filter="[{$:/temp/poc/coleccion/datos}jsonindexes[]]" variable="item">
+<$wikify name="registro" text={{{ [{$:/temp/poc/coleccion/datos}jsonextract<item>] }}}>
+<$list filter="[<registro>jsonget[tags]match[Checklist]]" variable="registro-lista">
+!!! <$text text={{{ [<registro>jsonget[title]] }}} />
+<$let checklistTitulo={{{ [<registro>jsonget[title]] }}}>
+<$list filter="[{$:/temp/poc/coleccion/datos}jsonindexes[]]" variable="paso">
+<$wikify name="elemento" text={{{ [{$:/temp/poc/coleccion/datos}jsonextract<paso>] }}}>
+<$list filter="[<elemento>jsonget[tags]regexp[Elemento de checklist]]">
+<$list filter="[<elemento>jsonget[checklist]match<checklistTitulo>]">
+* <$text text={{{ [<elemento>jsonget[title]] }}} /> — <$text text={{{ [<elemento>jsonget[estado]] }}} />
+</$list>
+</$list>
+</$wikify>
+</$list>
+</$let>
+</$list>
+</$wikify>
+</$list>
+</$list>
+<$list filter="[{$:/temp/poc/coleccion/estado}!is[blank]!match[200]!match[pending]]">Error HTTP {{ $:/temp/poc/coleccion/estado }}: {{ $:/temp/poc/coleccion/error }}</$list>

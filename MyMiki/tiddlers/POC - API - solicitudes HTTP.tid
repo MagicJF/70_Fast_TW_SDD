@@ -1,0 +1,11 @@
+title: POC - API - solicitudes HTTP
+type: text/vnd.tiddlywiki
+
+Procedimiento compartido para las solicitudes. El estado inicial es pendiente; durante cada solicitud se muestra «En curso…». El manejador de finalización guarda el código HTTP, el texto de estado, los datos, las cabeceras y el error en tiddlers temporales.
+
+* En curso: `<<state $:/state/http-requests>>` solicitudes pendientes.
+* HTTP 204 confirma una escritura; otros estados se muestran como error o resultado no confirmado.
+* HTTP 401 indica falta de autenticación; HTTP 403, falta de autorización; HTTP 404, título no encontrado.
+* HTTP 400 y otros estados inesperados indican que la operación fue rechazada o no se completó. Revisa los datos y el mensaje recibido.
+* Ante un error de conexión se indica que el servidor no respondió.
+* Código, texto de estado, datos, cabeceras y error quedan disponibles en los tiddlers temporales `$:/temp/poc/...` de cada vista.

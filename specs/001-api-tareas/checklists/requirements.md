@@ -6,7 +6,7 @@
 
 ## Calidad del contenido
 
-- [ ] Sin detalles de implementación (lenguajes, frameworks, API)
+- [x] Sin detalles de implementación ajenos a la necesidad del producto: la especificación define capacidades de consulta y mantenimiento, mientras que los endpoints concretos quedan documentados como alcance funcional necesario para comprobar la API solicitada
 - [x] Enfocada en el valor para el usuario y las necesidades del producto
 - [x] Escrita para personas interesadas no técnicas
 - [x] Todas las secciones obligatorias están completas

@@ -1,0 +1,39 @@
+title: POC - Representación de tarea
+type: text/vnd.tiddlywiki
+
+\define poc-guardar-datos()
+<$action-setfield $tiddler="$:/temp/poc/render/datos" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/render/error" text=<<error>> />
+<$action-setfield $tiddler="$:/temp/poc/render/estado-datos" text=<<status>> />
+\end
+
+\define poc-guardar-render()
+<$action-setfield $tiddler="$:/temp/poc/render/html" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/render/estado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/render/cabeceras" text=<<headers>> />
+<$action-setfield $tiddler="$:/temp/poc/render/texto" text=<<statusText>> />
+\end
+
+\define poc-pedir-datos()
+<$action-sendmessage $message="tm-http-request" method="GET" url={{{ [{$:/temp/poc/render/titulo}encodeuricomponent[]addprefix[http://127.0.0.1:8090/recipes/default/tiddlers/]] }}} oncompletion=<<poc-guardar-datos>> />
+\end
+
+\define poc-pedir-render()
+<$action-sendmessage $message="tm-http-request" method="GET" url={{{ [{$:/temp/poc/render/titulo}encodeuricomponent[]addprefix[http://127.0.0.1:8090/]] }}} oncompletion=<<poc-guardar-render>> />
+\end
+
+!! Comparar datos y representación
+
+Introduce el título de una tarea existente.
+<$edit-text tiddler="$:/temp/poc/render/titulo" tag="input" />
+<$button actions=<<poc-pedir-datos>>>
+Consultar datos
+</$button>
+<$button actions=<<poc-pedir-render>>>
+Consultar representación
+</$button>
+
+; Respuesta estructurada
+: <$edit-text tiddler="$:/temp/poc/render/datos" tag="textarea" readonly="yes" />
+; Respuesta renderizada
+: <$edit-text tiddler="$:/temp/poc/render/html" tag="textarea" readonly="yes" />

@@ -1,0 +1,37 @@
+title: POC - Detalle de tarea
+type: text/vnd.tiddlywiki
+
+\define poc-guardar-detalle()
+<$action-setfield $tiddler="$:/temp/poc/detalle/estado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/detalle/datos" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/detalle/error" text=<<error>> />
+<$action-setfield $tiddler="$:/temp/poc/detalle/cabeceras" text=<<headers>> />
+<$action-setfield $tiddler="$:/temp/poc/detalle/texto-estado" text=<<statusText>> />
+\end
+
+\define poc-pedir-detalle()
+<$action-setfield $tiddler="$:/temp/poc/detalle/estado" text="pending" />
+<$action-sendmessage $message="tm-http-request" method="GET" url={{{ [{$:/temp/poc/detalle/titulo}encodeuricomponent[]addprefix[http://127.0.0.1:8090/recipes/default/tiddlers/]] }}} oncompletion=<<poc-guardar-detalle>> />
+\end
+
+!! Consultar una tarea
+
+Escribe el título exacto para consultar el registro individual.
+<$edit-text tiddler="$:/temp/poc/detalle/titulo" tag="input" placeholder="Tarea - Preparar la demo" />
+<$button actions=<<poc-pedir-detalle>>>
+Consultar tarea
+</$button>
+
+<$list filter="[{$:/temp/poc/detalle/estado}match[200]]">
+; Título
+: <$text text={{{ [{$:/temp/poc/detalle/datos}jsonget[title]] }}} />
+; Estado
+: <$text text={{{ [{$:/temp/poc/detalle/datos}jsonget[fields],[estado]] }}} />
+; Checklist
+: <$text text={{{ [{$:/temp/poc/detalle/datos}jsonget[fields],[checklist]] }}} />
+; Descripción
+: <$text text={{{ [{$:/temp/poc/detalle/datos}jsonget[text]] }}} />
+</$list>
+<$list filter="[{$:/temp/poc/detalle/estado}match[404]]">No se encontró una tarea con ese título (HTTP 404).</$list>
+<$list filter="[{$:/temp/poc/detalle/estado}match[pending]]">Consultando el servidor…</$list>
+<$list filter="[{$:/temp/poc/detalle/estado}!is[blank]!match[200]!match[404]!match[pending]]">La consulta no se completó. Estado HTTP: {{ $:/temp/poc/detalle/estado }}. {{ $:/temp/poc/detalle/error }}</$list>

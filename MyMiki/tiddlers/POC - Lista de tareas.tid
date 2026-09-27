@@ -1,0 +1,34 @@
+title: POC - Lista de tareas
+type: text/vnd.tiddlywiki
+
+\define poc-pedir-coleccion()
+<$action-setfield $tiddler="$:/temp/poc/coleccion/estado" text="pending" />
+<$action-sendmessage $message="tm-http-request" method="GET" url="http://127.0.0.1:8090/recipes/default/tiddlers.json" oncompletion=<<poc-guardar-coleccion>> />
+\end
+
+\define poc-guardar-coleccion()
+<$action-setfield $tiddler="$:/temp/poc/coleccion/estado" text=<<status>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/datos" text=<<data>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/error" text=<<error>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/cabeceras" text=<<headers>> />
+<$action-setfield $tiddler="$:/temp/poc/coleccion/texto-estado" text=<<statusText>> />
+\end
+
+!! Tareas
+
+<$button actions=<<poc-pedir-coleccion>>>
+Cargar tareas desde el servidor
+</$button>
+<$list filter="[{$:/temp/poc/coleccion/estado}match[pending]]">Consultando el servidor…</$list>
+<$list filter="[{$:/temp/poc/coleccion/estado}match[200]]">
+<$list filter="[{$:/temp/poc/coleccion/datos}jsonindexes[]]" variable="item">
+<$wikify name="registro" text={{{ [{$:/temp/poc/coleccion/datos}jsonextract<item>] }}}>
+<$list filter="[<registro>jsonget[tags]match[Tarea]]">
+* <$link to={{{ [<registro>jsonget[title]] }}}><$text text={{{ [<registro>jsonget[title]] }}} /></$link> — <$text text={{{ [<registro>jsonget[estado]] }}} />
+</$list>
+</$wikify>
+</$list>
+</$list>
+<$list filter="[{$:/temp/poc/coleccion/estado}!is[blank]!match[200]!match[pending]]">Error HTTP {{ $:/temp/poc/coleccion/estado }}: {{ $:/temp/poc/coleccion/error }}</$list>
+
+<$list filter="[{$:/temp/poc/coleccion/estado}is[blank]]">Pulsa el botón para consultar la colección.</$list>
