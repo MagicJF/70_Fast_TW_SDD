@@ -6,7 +6,7 @@
 
 ## Calidad del contenido
 
-- [x] Sin detalles de implementación (lenguajes, frameworks, API)
+- [ ] Sin detalles de implementación (lenguajes, frameworks, API)
 - [x] Enfocada en el valor para el usuario y las necesidades del producto
 - [x] Escrita para personas interesadas no técnicas
 - [x] Todas las secciones obligatorias están completas

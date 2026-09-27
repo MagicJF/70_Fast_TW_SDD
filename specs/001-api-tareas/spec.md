@@ -8,6 +8,12 @@
 
 **Entrada**: Descripción del usuario: «Quiero una POC MVP que explore las posibilidades de la API de TiddlyWiki, por ejemplo para una gestión de tareas y checklists. Consultar la documentación de WebServer API».
 
+## Aclaraciones
+
+### Sesión 2026-09-27
+
+- Q: ¿Quieres que la POC compruebe directamente desde WikiText las operaciones de lectura y escritura del WebServer API para gestionar tareas y checklists? → A: Sí; se permite todo WikiText y la POC debe comprobar esas operaciones directamente.
+
 ## Escenarios de usuario y pruebas
 
 ### Historia 1: Consultar y organizar tareas (Prioridad: P1)
@@ -81,8 +87,8 @@ Como usuario o persona que evalúa la POC, quiero comprobar si el servidor admit
 - **FR-008**: La persona MUST poder eliminar una tarea y confirmar su ausencia en la consulta posterior.
 - **FR-009**: La POC MUST presentar fallos de disponibilidad, autenticación, autorización y validación como errores comprensibles; MUST NOT informar éxito si el servidor no lo confirmó.
 - **FR-010**: La POC MUST permitir comparar la vista de datos con la representación renderizada de una tarea.
-- **FR-011**: La POC MUST identificar las operaciones cubiertas y sus límites, incluyendo las capacidades de lectura, escritura y eliminación ejercitadas en el recorrido de tareas.
-- **FR-012**: El recorrido MUST poder completarse en una instancia local de TiddlyWiki y usar exclusivamente las capacidades aprobadas por las restricciones del proyecto.
+- **FR-011**: La POC MUST identificar las operaciones cubiertas y sus límites, y ejercitar directamente desde WikiText las operaciones disponibles de lectura, alta, actualización y eliminación del WebServer API en el recorrido de tareas y checklists.
+- **FR-012**: El recorrido MUST poder completarse en una instancia local de TiddlyWiki y usar las capacidades disponibles de WikiText y del WebServer API; no MUST añadir JavaScript, CSS, HTML, paquetes, plugins ni cambios de configuración.
 
 ### Entidades principales
 
@@ -104,8 +110,8 @@ Como usuario o persona que evalúa la POC, quiero comprobar si el servidor admit
 ## Supuestos
 
 - El usuario principal es una persona que gestiona sus propias tareas en una wiki local o de confianza; la POC no implica colaboración multiusuario.
-- “Explorar todas las posibilidades” se interpreta como demostrar un conjunto representativo de operaciones del WebServer API dentro del caso de uso de tareas y checklists, no reproducir exhaustivamente todos sus endpoints y parámetros.
-- El alcance de esta feature se mantiene dentro de las restricciones de la constitución: WikiText en tiddlers de `/home/dev/projects/70_Fast_TW_SDD/MyWiki/tiddlers`, sin incorporar JavaScript, CSS, HTML, paquetes, plugins o cambios de configuración.
+- “Explorar todas las posibilidades” se interpreta como probar de extremo a extremo las operaciones relevantes del WebServer API para tareas y checklists desde WikiText; no requiere cubrir endpoints ajenos a ese caso de uso.
+- El alcance de esta feature se mantiene dentro de las restricciones de la constitución: WikiText en tiddlers de `/home/dev/projects/70_Fast_TW_SDD/MyWiki/tiddlers`; se permiten todas las capacidades disponibles en WikiText, incluidas llamadas directas al WebServer API, sin incorporar JavaScript, CSS, HTML, paquetes, plugins o cambios de configuración.
 - La documentación consultada describe rutas para estado, colección, tiddler individual, alta/actualización, eliminación y renderizado; estas rutas se consideran capacidades del servicio que la POC pretende representar, sin prescribir su implementación.
 - La wiki destino prevista por la constitución se encuentra en `/home/dev/projects/70_Fast_TW_SDD/MyWiki`; el checkout actual contiene una carpeta `/home/dev/projects/70_Fast_TW_SDD/MyMiki`, diferencia que deberá resolverse durante la planificación o implementación si se usa como entorno real.
 - La autorización y persistencia dependen de la configuración y permisos de la instancia local; no se presupone exposición pública ni se cambia la configuración del servidor como parte de esta feature.
