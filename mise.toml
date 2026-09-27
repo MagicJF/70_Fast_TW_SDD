@@ -1,0 +1,21 @@
+[tools]
+node = "24"
+python = "3.13"
+uv = "latest"
+jj = "0.45.1"
+
+"pypi:specify-cli" = "latest"
+"npm:@openai/codex" = "latest"
+"npm:tiddlywiki" = "latest"
+"npm:playwright" = "1.63.0"
+
+[env]
+_.path = ["{{config_root}}/node_modules/.bin"]
+
+[tasks.dev]
+description = "Iniciar TiddlyWiki"
+run = "tiddlywiki wiki --listen"
+
+[tasks.playwright-install]
+description = "Instalar Chromium compatible con la versión de Playwright del proyecto"
+run = "playwright install chromium"
